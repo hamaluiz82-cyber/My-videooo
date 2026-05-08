@@ -19,7 +19,7 @@ bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start'])
 def start(message):
-user_id = str(message.from_user.id)
+    user_id = str(message.from_user.id)
 
     if user_id not in users:
         users.add(user_id)
