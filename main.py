@@ -46,8 +46,8 @@ def download_video(message):
             url = r.url
 
         ydl_opts = {
-            'format': 'mp4[height<=720]',
-            'outtmpl': '%(id)s.%(ext)s',
+            'format': 'best',
+            'outtmpl': '%(title)s.%(ext)s',
             'quiet': True,
             'noplaylist': True
         }
