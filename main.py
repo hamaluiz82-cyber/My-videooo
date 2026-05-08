@@ -15,10 +15,42 @@ users = load_users()
 
 TOKEN = os.getenv("TOKEN")
 
+CHANNEL_USERNAME = "@myviideo"
+
 bot = telebot.TeleBot(TOKEN)
+
+def is_joined(user_id):
+
+    try:
+        member = bot.get_chat_member(CHANNEL_USERNAME, user_id)
+
+        return member.status in ['member', 'administrator', 'creator']
+
+    except:
+        return False
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
+
+    if not is_joined(message.from_user.id):
+
+        markup = telebot.types.InlineKeyboardMarkup()
+
+        btn = telebot.types.InlineKeyboardButton(
+            "📢 Join Channel",
+            url=f"https://t.me/{CHANNEL_USERNAME.replace('@','')}"
+        )
+
+        markup.add(btn)
+
+        bot.reply_to(
+            message,
+            "📢 تکایە سەرەتا join ـی چەناڵ بکە",
+            reply_markup=markup
+        )
+
+        return
 
     user_id = str(message.from_user.id)
 
@@ -39,6 +71,9 @@ def start(message):
 ✅ Instagram
 ✅ YouTube
 
+🚀 No Watermark
+⚡ Fast Download
+
 🔗 تەنها لینک بنێرە
 """
 
@@ -47,6 +82,25 @@ def start(message):
 
 @bot.message_handler(func=lambda message: True)
 def download_video(message):
+
+    if not is_joined(message.from_user.id):
+
+        markup = telebot.types.InlineKeyboardMarkup()
+
+        btn = telebot.types.InlineKeyboardButton(
+            "📢 Join Channel",
+            url=f"https://t.me/{CHANNEL_USERNAME.replace('@','')}"
+        )
+
+        markup.add(btn)
+
+        bot.reply_to(
+            message,
+            "📢 بۆ بەکارهێنانی بۆت، join ـی چەناڵ بکە",
+            reply_markup=markup
+        )
+
+        return
 
     url = message.text
 
