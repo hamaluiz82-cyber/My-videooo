@@ -19,6 +19,7 @@ bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start'])
 def start(message):
+
     user_id = str(message.from_user.id)
 
     if user_id not in users:
@@ -28,8 +29,9 @@ def start(message):
             f.write(user_id + "\n")
 
     bot.reply_to(
-        message,
+        message.chat.id,
         f"👋 Welcome\n👥 Users: {len(users)}"
+    )
     text = """
 👋 بەخێربێیت بۆ بۆتی داونلۆدی ڤیدیۆ
 
