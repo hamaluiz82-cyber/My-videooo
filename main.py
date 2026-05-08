@@ -28,12 +28,10 @@ def start(message):
         with open("users.txt", "a") as f:
             f.write(user_id + "\n")
 
-    bot.reply_to(
-        message.chat.id,
-        f"👋 Welcome\n👥 Users: {len(users)}"
-    )
-    text = """
+    text = f"""
 👋 بەخێربێیت بۆ بۆتی داونلۆدی ڤیدیۆ
+
+👥 Users: {len(users)}
 
 📥 پشتگیری:
 ✅ TikTok
@@ -45,6 +43,7 @@ def start(message):
 """
 
     bot.reply_to(message, text)
+
 
 @bot.message_handler(func=lambda message: True)
 def download_video(message):
@@ -81,13 +80,15 @@ def download_video(message):
 
         with open(filename, 'rb') as video:
 
-            bot.send_video(message.chat.id, open(filename, 'rb'))
+            bot.send_video(message.chat.id, video)
 
-os.remove(filename)
+        # delete file after sending
+        os.remove(filename)
 
     except Exception as e:
 
         bot.reply_to(message, f"❌ هەڵە:\n{e}")
+
 
 print("Bot Running...")
 
