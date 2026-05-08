@@ -2,37 +2,16 @@ import telebot
 import yt_dlp
 import os
 import requests
+import time
 
-TOKEN = "8659428362:AAGCTsgpgstiPG8kJRToGI2uidKh2lRdIhg"
+TOKEN = os.getenv("TOKEN")
+
 bot = telebot.TeleBot(TOKEN)
-
-# =========================
-# Load Users
-# =========================
-
-users = set()
-
-if os.path.exists("users.txt"):
-    with open("users.txt", "r") as f:
-        users = set(f.read().splitlines())
-
-# =========================
-# Start Command
-# =========================
 
 @bot.message_handler(commands=['start'])
 def start(message):
 
-    user_id = str(message.chat.id)
-
-    if user_id not in users:
-
-        users.add(user_id)
-
-        with open("users.txt", "a") as f:
-            f.write(user_id + "\n")
-
-    text = f"""
+    text = """
 👋 بەخێربێیت بۆ بۆتی داونلۆدی ڤیدیۆ
 
 📥 پشتگیری:
@@ -41,16 +20,10 @@ def start(message):
 ✅ Instagram
 ✅ YouTube
 
-👥 ژمارەی بەکارهێنەران: {len(users)}
-
 🔗 تەنها لینک بنێرە
 """
 
     bot.reply_to(message, text)
-
-# =========================
-# Download Video
-# =========================
 
 @bot.message_handler(func=lambda message: True)
 def download_video(message):
@@ -97,4 +70,9 @@ def download_video(message):
 
 print("Bot Running...")
 
-bot.infinity_polling()
+while True:
+    try:
+        bot.infinity_polling(timeout=10, long_polling_timeout=5)
+    except Exception as e:
+        print(f"Error: {e}")
+        time.sleep(5)
