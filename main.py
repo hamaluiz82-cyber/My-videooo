@@ -124,6 +124,7 @@ def download_video(message):
             'outtmpl': '%(title)s.%(ext)s',
             'quiet': True,
             'noplaylist': True
+            'cookiefile': 'cookies.txt'
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
