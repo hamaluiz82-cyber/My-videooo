@@ -108,7 +108,6 @@ def download_video(message):
 
     try:
 
-        # TikTok short link fix
         if "vt.tiktok.com" in url:
 
             headers = {
@@ -123,8 +122,8 @@ def download_video(message):
             'format': 'best',
             'outtmpl': '%(title)s.%(ext)s',
             'quiet': True,
-            'noplaylist': True
-            'cookiefile': 'cookies.txt'
+            'noplaylist': True,
+            'cookiefile': 'cookies.txt',
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -137,7 +136,6 @@ def download_video(message):
 
             bot.send_video(message.chat.id, video)
 
-        # delete file after sending
         os.remove(filename)
 
     except Exception as e:
