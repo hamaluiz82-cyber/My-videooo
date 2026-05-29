@@ -120,7 +120,7 @@ def download_video(message):
 
         ydl_opts = {
             'format': 'best',
-            'outtmpl': '%(title)s.%(ext)s',
+            'outtmpl': 'video.%(ext)s',
             'quiet': True,
             'noplaylist': True,
             'cookiefile': 'cookies.txt',
