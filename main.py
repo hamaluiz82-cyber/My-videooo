@@ -108,40 +108,40 @@ def download_video(message):
 
     try:
 
-        if "vt.tiktok.com" in url:
+    if "vt.tiktok.com" in url:
 
-            headers = {
-                "User-Agent": "Mozilla/5.0"
-            }
-
-            r = requests.get(url, headers=headers, allow_redirects=True)
-
-            url = r.url
-
-        ydl_opts = {
-            'format': 'best',
-            'outtmpl': 'video.%(ext)s',
-            'quiet': True,
-            'noplaylist': True,
-            'cookiefile': 'cookies.txt',
+        headers = {
+            "User-Agent": "Mozilla/5.0"
         }
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        r = requests.get(url, headers=headers, allow_redirects=True)
 
-            info = ydl.extract_info(url, download=True)
+        url = r.url
 
-            filename = ydl.prepare_filename(info)
+    ydl_opts = {
+        'format': 'best',
+        'outtmpl': 'video.%(ext)s',
+        'quiet': True,
+        'noplaylist': True,
+        'nocheckcertificate': True,
+        'extractor_retries': 5,
+    }
 
-        with open(filename, 'rb') as video:
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
 
-            bot.send_video(message.chat.id, video)
+        info = ydl.extract_info(url, download=True)
 
-        os.remove(filename)
+        filename = ydl.prepare_filename(info)
 
-    except Exception as e:
+    with open(filename, 'rb') as video:
 
-        bot.reply_to(message, f"❌ هەڵە:\n{e}")
+        bot.send_video(message.chat.id, video)
 
+    os.remove(filename)
+
+except Exception as e:
+
+    bot.reply_to(message, f"❌ هەڵە:\n{e}")
 
 print("Bot Running...")
 
