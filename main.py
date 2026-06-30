@@ -41,19 +41,16 @@ def is_joined(user_id):
 def start(message):
 
     if not is_joined(message.from_user.id):
-
         markup = telebot.types.InlineKeyboardMarkup()
-
         btn = telebot.types.InlineKeyboardButton(
             "📢 Join Channel",
-            url=f"https://t.me/{CHANNEL_USERNAME.replace('@', '')}"
+            url=f"https://t.me/{CHANNEL_USERNAME.replace('@','')}"
         )
-
         markup.add(btn)
 
         bot.reply_to(
             message,
-            "📢 تکایە سەرەتا join ـی چەناڵ بکە",
+            "📢 تکایە سەرەتا Join ـی چەناڵ بکە",
             reply_markup=markup
         )
         return
@@ -62,7 +59,6 @@ def start(message):
 
     if user_id not in users:
         users.add(user_id)
-
         with open("users.txt", "a") as f:
             f.write(user_id + "\n")
 
@@ -76,6 +72,7 @@ def start(message):
 ✅ Facebook
 ✅ Instagram
 ✅ YouTube
+✅ X (Twitter)
 
 🚀 No Watermark
 ⚡ Fast Download
@@ -92,56 +89,59 @@ def start(message):
 def download_video(message):
 
     if not is_joined(message.from_user.id):
-
         markup = telebot.types.InlineKeyboardMarkup()
 
         btn = telebot.types.InlineKeyboardButton(
             "📢 Join Channel",
-            url=f"https://t.me/{CHANNEL_USERNAME.replace('@', '')}"
+            url=f"https://t.me/{CHANNEL_USERNAME.replace('@','')}"
         )
 
         markup.add(btn)
 
         bot.reply_to(
             message,
-            "📢 بۆ بەکارهێنانی بۆت، join ـی چەناڵ بکە",
+            "📢 بۆ بەکارهێنانی بۆت، Join ـی چەناڵ بکە",
             reply_markup=markup
         )
         return
 
     url = message.text.strip()
 
-    bot.reply_to(message, "⏳ چاوەڕێبە...")
+    wait = bot.reply_to(message, "⏳ چاوەڕێبە...")
 
     try:
 
-        # TikTok Short Link Fix
+        # Fix TikTok short links
         if "vt.tiktok.com" in url:
-            headers = {
-                "User-Agent": "Mozilla/5.0"
-            }
-
             response = requests.get(
                 url,
-                headers=headers,
+                headers={"User-Agent": "Mozilla/5.0"},
                 allow_redirects=True,
                 timeout=10
             )
-
             url = response.url
 
         ydl_opts = {
-            "format": "best",
-            "outtmpl": "video.%(ext)s",
+            "format": "bestvideo+bestaudio/best",
+            "merge_output_format": "mp4",
+            "outtmpl": "%(id)s.%(ext)s",
             "quiet": True,
             "noplaylist": True,
             "nocheckcertificate": True,
-            "extractor_retries": 5,
+            "extractor_retries": 10,
+            "socket_timeout": 30,
+            "http_headers": {
+                "User-Agent": "Mozilla/5.0"
+            },
+            # ئەگەر cookies.txt هەبێت خۆکارانە بەکاری دەهێنێت
+            "cookiefile": "cookies.txt" if os.path.exists("cookies.txt") else None,
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             filename = ydl.prepare_filename(info)
+
+        bot.delete_message(message.chat.id, wait.message_id)
 
         with open(filename, "rb") as video:
             bot.send_video(message.chat.id, video)
@@ -150,7 +150,11 @@ def download_video(message):
             os.remove(filename)
 
     except Exception as e:
-        bot.reply_to(message, f"❌ هەڵە:\n{str(e)}")
+        bot.edit_message_text(
+            f"❌ هەڵە:\n\n{str(e)}",
+            message.chat.id,
+            wait.message_id
+        )
 
 # =========================
 # Run Bot
@@ -159,10 +163,7 @@ print("Bot Running...")
 
 while True:
     try:
-        bot.infinity_polling(
-            timeout=10,
-            long_polling_timeout=5
-        )
+        bot.infinity_polling(timeout=20, long_polling_timeout=10)
     except Exception as e:
-        print(f"Error: {e}")
+        print(e)
         time.sleep(5)
