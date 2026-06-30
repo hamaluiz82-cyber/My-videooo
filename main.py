@@ -28,13 +28,16 @@ users = load_users()
 
 def fix_url(url):
     if "vt.tiktok.com" in url or "vm.tiktok.com" in url:
-        r = requests.get(
-            url,
-            headers={"User-Agent": "Mozilla/5.0"},
-            allow_redirects=True,
-            timeout=15
-        )
-        return r.url
+        try:
+            r = requests.get(
+                url,
+                headers={"User-Agent": "Mozilla/5.0"},
+                allow_redirects=True,
+                timeout=20
+            )
+            return r.url
+        except:
+            return url
     return url
 
 def download_with_ytdlp(url):
@@ -50,8 +53,21 @@ def download_with_ytdlp(url):
         "retries": 10,
         "fragment_retries": 10,
         "socket_timeout": 30,
+
+        "extractor_args": {
+            "tiktok": {
+                "api_hostname": ["api16-normal-c-useast1a.tiktokv.com"]
+            }
+        },
+
         "http_headers": {
-            "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15"
+            "User-Agent": (
+                "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) "
+                "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 "
+                "Mobile/15E148 Safari/604.1"
+            ),
+            "Referer": "https://www.tiktok.com/",
+            "Accept-Language": "en-US,en;q=0.9"
         }
     }
 
@@ -132,23 +148,32 @@ def handle_link(message):
             pass
 
         with open(filename, "rb") as video:
-            bot.send_video(
-                message.chat.id,
-                video,
-                caption="✅ داونلۆد کرا"
-            )
+            bot.send_video(message.chat.id, video, caption="✅ داونلۆد کرا")
 
     except Exception as e:
-        try:
-            bot.edit_message_text(
-                "❌ هەڵە ڕوویدا\n\n"
-                "ئەگەر لینکەکە Instagram/Facebook ـە، پێویستی بە cookies.txt هەیە.\n\n"
-                f"{str(e)}",
-                message.chat.id,
-                wait.message_id
+        error_text = str(e)
+
+        if "TikTok" in error_text:
+            msg = (
+                "❌ هەڵەی TikTok ڕوویدا\n\n"
+                "چارەسەر:\n"
+                "1️⃣ yt-dlp لە Railway نوێ بکەوە\n"
+                "2️⃣ requirements.txt بنووسە:\n"
+                "yt-dlp>=2026.01.01\n\n"
+                f"{error_text}"
             )
+        elif "Instagram" in error_text or "Facebook" in error_text:
+            msg = (
+                "❌ ئەم لینکە پێویستی بە cookies.txt هەیە\n\n"
+                f"{error_text}"
+            )
+        else:
+            msg = f"❌ هەڵە ڕوویدا:\n\n{error_text}"
+
+        try:
+            bot.edit_message_text(msg, message.chat.id, wait.message_id)
         except:
-            bot.reply_to(message, f"❌ هەڵە:\n{str(e)}")
+            bot.reply_to(message, msg)
 
     finally:
         if filename and os.path.exists(filename):
