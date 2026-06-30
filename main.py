@@ -219,7 +219,7 @@ def handle_link(message):
     if not is_joined(message.from_user.id):
         bot.reply_to(
             message,
-            "ð¢ Ø¨Û Ø¨ÛÚ©Ø§Ø±ÙÛÙØ§ÙÛ Ø¨ÛØªØ Join ÙÛ ÚÛÙØ§Úµ Ø¨Ú©Û",
+            "تكایە جۆینی چەناڵ بكە",
             reply_markup=join_markup()
         )
         return
@@ -228,10 +228,10 @@ def handle_link(message):
 
     url = (message.text or "").strip()
     if not url.startswith("http"):
-        bot.reply_to(message, "â ØªÚ©Ø§ÛÛ ÙÛÙÚ©ÛÚ©Û Ø¯Ø±ÙØ³Øª Ø¨ÙÛØ±Û")
+        bot.reply_to(message, "❌ تکایە لینکێکی دروست بنێرە")
         return
 
-    wait = bot.reply_to(message, "â³ ÚØ§ÙÛÚÛØ¨ÛØ Ú¤ÛØ¯ÛÛÚ©Û Ø¯Ø§Ø¯ÛÚ¯ÛØ±ÛØª...")
+    wait = bot.reply_to(message, "⏳ چاوەڕێبە، ڤیدیۆکە دادەگیرێت...")
     filename = None
 
     try:
@@ -246,7 +246,7 @@ def handle_link(message):
             bot.send_video(
                 message.chat.id,
                 video,
-                caption="â Ø¯Ø§ÙÙÙÛØ¯ Ú©Ø±Ø§",
+                caption="✅ ڤیدیۆکە داونلۆد کرا",
                 supports_streaming=True
             )
 
